@@ -1,0 +1,23 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "data-transfer",
+    "section": "",
+    "text": "import os\nimport time\nimport subprocess\ndef get_directory_size(directory):\n    total = 0\n    for entry in os.scandir(directory):\n        if entry.is_file():\n            total += entry.stat().st_size\n        elif entry.is_dir():\n            total += get_directory_size(entry.path)\n    return total\nsource = \"/home/ngo/Downloads/rsync/source/\"\ndest = \"/home/ngo/Downloads/rsync/dest/\"\ndirectory_size = get_directory_size(source)\n\nstart_time = time.time()\nsubprocess.call([\"rsync\", \"-a\",\"--info=progress\", source, dest])\nExecution_time=time.time() - start_time\nSpeed=directory_size/Execution_time\nprint(f\"Speed = {Speed/ 1048576} Mb/s\")\nSpeed = 156.17 Mb/s\n\n\n\nimport os\nimport subprocess\nfrom multiprocessing import Pool, cpu_count\nimport time\n\n\ndef get_directory_size(directory):\n    total = 0\n    for entry in os.scandir(directory):\n        if entry.is_file():\n            total += entry.stat().st_size\n        elif entry.is_dir():\n            total += get_directory_size(entry.path)\n    return total\n\nsrc = \"/home/ngo/Downloads/rsync/source/\"\ndest = \"/home/ngo/Downloads/rsync/dest/\"\nif not os.path.exists(dest):\n    os.mkdir(dest)\nnum_processes = cpu_count()  # Number of available CPU cores\n\ndirectory_size = get_directory_size(src)\n\ndef sync_files(source):\n    subprocess.call([\"rsync\", \"-a\",\"--info=progress\", source, dest])\n\nif __name__ == \"__main__\":\n    \n    start_time = time.time()\n    #directories = next(os.walk(src))[1]\n    directories = os.listdir(src)\n    directory_paths = [os.path.join(src, directory) for directory in directories]\n    \n    with Pool(processes=num_processes) as pool:\n        pool.map(sync_files, directory_paths)\n    \n    pool.join()\n    Execution_time=time.time() - start_time\n\nSpeed=directory_size/Execution_time\nprint(f\"Speed = {Speed/ 1048576} Mb/s\")\nSpeed = 232.63 Mb/s\n\n\n\n#!/bin/bash   \nmyFunction() {\n    sleep 0.25\n    rsync -alv --info=progress $1 .\n}\nSOURCE_DIR=./source/\nDEST_DIR=./dest/\n\n# Measure total size of files to be transferred\nTOTAL_SIZE=` du -sb $SOURCE_DIR | cut -f1`\necho Total size of files to be transferred: $TOTAL_SIZE\n\nSTART_TIME=`date +%s`\n\nexport -f myFunction\nfind $SOURCE_DIR -type f | xargs -L1 -P8 -I {} bash -c 'myFunction \"$@\"' _ {}\n\nEND_TIME=`date +%s`\nEXECUTION_TIME=$((END_TIME-START_TIME))\n#echo Execution time: $EXECUTION_TIME\necho Speed: `echo \"scale=4; $TOTAL_SIZE / 1048576 / $EXECUTION_TIME\" | bc ` MB/s\necho Total Time: $EXECUTION_TIME\nSpeed= 426.7222 MB/s\n\n\n\nimport time\nstart_time = time.time()\n! rsync -alv --info=progress ./source/ ./dest/\nprint(\"--- %s seconds ---\" % (time.time() - start_time))"
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "data-transfer",
+    "section": "",
+    "text": "python\n(single core)\npython\n(parallel)\nrsync\n(single core)\nrsync\n(parallel xargs)\n\n\n\n\nSpeed (Mb/s)\n156.17\n232.63\n155.37\n426.72"
+  },
+  {
+    "objectID": "about.html#exaplaination",
+    "href": "about.html#exaplaination",
+    "title": "data-transfer",
+    "section": "Exaplaination",
+    "text": "Exaplaination\nThe xargs command in bash can manage the parallel execution of rsync more efficiently because it is specifically designed for this purpose. Python’s module provides a high-level interface for parallel execution, but it may not match the performance of xargs with rsync"
+  }
+]
